@@ -17,13 +17,13 @@ export default function DashboardError({
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-10">
       <div className="text-center">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.2em]">
           Error
         </p>
-        <h2 className="mt-1 font-mono font-bold text-xl tracking-tight">
+        <h2 className="mt-1 font-bold font-mono text-xl tracking-tight">
           Something went wrong
         </h2>
-        <p className="mt-2 font-sans text-sm text-muted-foreground">
+        <p className="mt-2 font-sans text-muted-foreground text-sm">
           {error.message || "An unexpected error occurred."}
         </p>
       </div>

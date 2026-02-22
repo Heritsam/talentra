@@ -13,7 +13,7 @@ import {
   sql,
 } from "@talentra/db";
 import { z } from "zod";
-import { publicProcedure } from "../index";
+import { protectedProcedure, publicProcedure } from "../index";
 
 const updateStatusSchema = z.object({
   id: z.string(),
@@ -32,8 +32,7 @@ export const applicationsRouter = {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const [jobStats] = await db
       .select({
-        openJobs:
-          sql<number>`COUNT(*) FILTER (WHERE ${jobs.status} = 'OPEN')`,
+        openJobs: sql<number>`COUNT(*) FILTER (WHERE ${jobs.status} = 'OPEN')`,
         openJobsThisWeek: sql<number>`COUNT(*) FILTER (WHERE ${jobs.status} = 'OPEN' AND ${jobs.createdAt} >= ${sevenDaysAgo})`,
         totalCandidates: sql<number>`COUNT(DISTINCT ${candidates.id})`,
         candidatesThisWeek: sql<number>`COUNT(DISTINCT ${candidates.id}) FILTER (WHERE ${candidates.createdAt} >= ${sevenDaysAgo})`,
@@ -127,7 +126,7 @@ export const applicationsRouter = {
       .limit(10);
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         jobId: z.string(),
@@ -139,7 +138,7 @@ export const applicationsRouter = {
       return row;
     }),
 
-  updateStatus: publicProcedure
+  updateStatus: protectedProcedure
     .input(updateStatusSchema)
     .handler(async ({ input }) => {
       const [row] = await db

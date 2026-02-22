@@ -10,6 +10,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -29,15 +30,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { Skeleton } from "./ui/skeleton";
 
-export function NavUser({
-  user: hmm,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const router = useRouter();
   const { isMobile } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
@@ -55,8 +48,7 @@ export function NavUser({
   }
 
   if (!session) {
-    router.push("/login");
-    return null;
+    return <p>Unauthorized</p>;
   }
 
   const user = {
@@ -70,6 +62,17 @@ export function NavUser({
       .join("")
       .toUpperCase()
       .substring(0, 2),
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed. Please try again.");
+    }
   };
 
   return (
@@ -136,7 +139,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleLogout}>
               <HugeiconsIcon icon={LogoutIcon} strokeWidth={2} />
               Log out
             </DropdownMenuItem>

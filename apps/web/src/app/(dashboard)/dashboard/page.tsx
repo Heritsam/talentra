@@ -6,8 +6,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { ApplicationsTrendChart } from "@/components/dashboard/applications-trend-chart";
 import { CreateCandidateModal } from "@/components/candidates/create-candidate-modal";
+import { ApplicationsTrendChart } from "@/components/dashboard/applications-trend-chart";
 import { CreateJobModal } from "@/components/jobs/create-job-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,10 +28,14 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const STAGE_COLORS: Record<string, string> = {
-  appliedCount: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  screeningCount: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  interviewCount: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
-  offerCount: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  appliedCount:
+    "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  screeningCount:
+    "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+  interviewCount:
+    "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+  offerCount:
+    "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -91,12 +95,19 @@ export default async function DashboardPage() {
         </span>
         <div className="ml-auto flex items-center gap-2">
           <CreateCandidateModal>
-            <Button variant="outline" size="sm" className="font-mono text-[10px] uppercase tracking-[0.12em]">
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-mono text-[10px] uppercase tracking-[0.12em]"
+            >
               New Candidate
             </Button>
           </CreateCandidateModal>
           <CreateJobModal>
-            <Button size="sm" className="font-mono text-[10px] uppercase tracking-[0.12em]">
+            <Button
+              size="sm"
+              className="font-mono text-[10px] uppercase tracking-[0.12em]"
+            >
               New Job
             </Button>
           </CreateJobModal>
@@ -166,15 +177,15 @@ export default async function DashboardPage() {
                     href={`/jobs/${app.jobId}/pipeline`}
                     className="flex items-center justify-between px-6 py-3 transition-colors hover:bg-muted/20"
                   >
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="font-medium font-mono text-sm leading-tight truncate">
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <span className="truncate font-medium font-mono text-sm leading-tight">
                         {app.candidateName}
                       </span>
-                      <span className="font-sans text-muted-foreground text-xs truncate">
+                      <span className="truncate font-sans text-muted-foreground text-xs">
                         {app.jobTitle}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 ml-4 shrink-0">
+                    <div className="ml-4 flex shrink-0 items-center gap-3">
                       <Badge
                         className={`${STATUS_COLORS[app.status]} rounded-full border-0 px-2 py-0.5 font-medium font-mono text-[10px]`}
                       >
@@ -212,15 +223,15 @@ export default async function DashboardPage() {
                     href={`/jobs/${job.id}/pipeline`}
                     className="flex items-center justify-between px-6 py-3 transition-colors hover:bg-muted/20"
                   >
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="font-medium font-mono text-sm leading-tight truncate">
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <span className="truncate font-medium font-mono text-sm leading-tight">
                         {job.title}
                       </span>
-                      <span className="font-sans text-muted-foreground text-xs truncate">
+                      <span className="truncate font-sans text-muted-foreground text-xs">
                         {job.department}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 ml-4 shrink-0">
+                    <div className="ml-4 flex shrink-0 items-center gap-1">
                       {(
                         [
                           "appliedCount",
@@ -233,7 +244,7 @@ export default async function DashboardPage() {
                         return (
                           <span
                             key={key}
-                            className={`${STAGE_COLORS[key]} rounded-full border-0 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums`}
+                            className={`${STAGE_COLORS[key]} rounded-full border-0 px-1.5 py-0.5 font-medium font-mono text-[10px] tabular-nums`}
                             title={STAGE_LABELS[key]}
                           >
                             {n}

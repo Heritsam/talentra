@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { applications, count, db, desc, eq, jobs, sql } from "@talentra/db";
 import { z } from "zod";
-import { publicProcedure } from "../index";
+import { protectedProcedure, publicProcedure } from "../index";
 
 const createJobSchema = z.object({
   title: z.string().min(1),
@@ -51,12 +51,14 @@ export const jobsRouter = {
       return { ...job, applications: applicants };
     }),
 
-  create: publicProcedure.input(createJobSchema).handler(async ({ input }) => {
-    const [row] = await db.insert(jobs).values(input).returning();
-    return row;
-  }),
+  create: protectedProcedure
+    .input(createJobSchema)
+    .handler(async ({ input }) => {
+      const [row] = await db.insert(jobs).values(input).returning();
+      return row;
+    }),
 
-  updateStatus: publicProcedure
+  updateStatus: protectedProcedure
     .input(updateStatusSchema)
     .handler(async ({ input }) => {
       const [row] = await db

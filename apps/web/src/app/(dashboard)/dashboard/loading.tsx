@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
   return (
@@ -46,7 +46,10 @@ export default function DashboardLoading() {
               <div className="divide-y">
                 {Array.from({ length: 5 }).map((_, i) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: skeleton
-                  <div key={i} className="flex items-center justify-between px-6 py-3">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-6 py-3"
+                  >
                     <div className="flex flex-col gap-1.5">
                       <Skeleton className="h-3 w-32" />
                       <Skeleton className="h-3 w-24" />

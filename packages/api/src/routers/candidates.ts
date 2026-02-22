@@ -1,5 +1,4 @@
 import { ORPCError } from "@orpc/server";
-import { z } from "zod";
 import {
   and,
   applications,
@@ -13,7 +12,8 @@ import {
   jobs,
   or,
 } from "@talentra/db";
-import { publicProcedure } from "../index";
+import { z } from "zod";
+import { protectedProcedure, publicProcedure } from "../index";
 
 const createCandidateSchema = z.object({
   name: z.string().min(1),
@@ -100,7 +100,7 @@ export const candidatesRouter = {
       return { ...candidate, applications: history };
     }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(createCandidateSchema)
     .handler(async ({ input }) => {
       const [row] = await db.insert(candidates).values(input).returning();

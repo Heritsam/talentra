@@ -1,17 +1,11 @@
 "use client";
 
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from "@/components/ui/chart";
 
 interface TrendPoint {
@@ -52,21 +46,36 @@ export function ApplicationsTrendChart({ data }: ApplicationsTrendChartProps) {
 
   return (
     <ChartContainer config={chartConfig} className="h-40 w-full">
-      <LineChart data={series} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
-        <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border" />
+      <LineChart
+        data={series}
+        margin={{ top: 4, right: 8, bottom: 0, left: -16 }}
+      >
+        <CartesianGrid
+          vertical={false}
+          strokeDasharray="3 3"
+          className="stroke-border"
+        />
         <XAxis
           dataKey="day"
           tickLine={false}
           axisLine={false}
           tickFormatter={(v, i) => (i % 6 === 0 ? formatDay(v) : "")}
-          tick={{ fontSize: 10, fontFamily: "var(--font-mono)", fill: "var(--color-muted-foreground)" }}
+          tick={{
+            fontSize: 10,
+            fontFamily: "var(--font-mono)",
+            fill: "var(--color-muted-foreground)",
+          }}
           interval={0}
         />
         <YAxis
           tickLine={false}
           axisLine={false}
           allowDecimals={false}
-          tick={{ fontSize: 10, fontFamily: "var(--font-mono)", fill: "var(--color-muted-foreground)" }}
+          tick={{
+            fontSize: 10,
+            fontFamily: "var(--font-mono)",
+            fill: "var(--color-muted-foreground)",
+          }}
           width={28}
         />
         <ChartTooltip
