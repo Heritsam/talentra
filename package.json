@@ -1,0 +1,55 @@
+{
+  "name": "talentra",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "drizzle-orm": "^0.45.1",
+      "zod": "^4.1.13",
+      "typescript": "^5",
+      "@types/bun": "^1.3.4",
+      "@cloudflare/workers-types": "^4.20251213.0",
+      "hono": "^4.8.2",
+      "@orpc/server": "^1.12.2",
+      "@orpc/openapi": "^1.12.2",
+      "@orpc/zod": "^1.12.2",
+      "better-auth": "^1.4.18",
+      "@orpc/client": "^1.12.2",
+      "alchemy": "^0.82.1"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @talentra/db db:push",
+    "db:studio": "turbo -F @talentra/db db:studio",
+    "db:generate": "turbo -F @talentra/db db:generate",
+    "db:migrate": "turbo -F @talentra/db db:migrate",
+    "deploy": "turbo -F @talentra/infra deploy",
+    "destroy": "turbo -F @talentra/infra destroy",
+    "check": "biome check --write ."
+  },
+  "dependencies": {
+    "@talentra/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@cloudflare/workers-types": "catalog:",
+    "@talentra/config": "workspace:*",
+    "@types/bun": "catalog:",
+    "turbo": "^2.6.3",
+    "typescript": "catalog:"
+  },
+  "packageManager": "bun@1.3.0"
+}

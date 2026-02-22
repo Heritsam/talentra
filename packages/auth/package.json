@@ -1,0 +1,24 @@
+{
+  "name": "@talentra/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@talentra/db": "workspace:*",
+    "@talentra/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@talentra/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
