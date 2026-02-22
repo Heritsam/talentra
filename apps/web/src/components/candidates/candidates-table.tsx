@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  type ColumnDef,
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+  flexRender,
+} from "@tanstack/react-table";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -24,6 +31,99 @@ type Candidate = {
   applicationCount: number;
 };
 
+function globalFilterFn(
+  row: { original: Candidate },
+  _: string,
+  filterValue: string,
+) {
+  const q = filterValue.toLowerCase();
+  if (!q) return true;
+  const c = row.original;
+  return (
+    c.name.toLowerCase().includes(q) ||
+    c.email.toLowerCase().includes(q) ||
+    c.skills.some((s) => s.toLowerCase().includes(q))
+  );
+}
+
+const columns: ColumnDef<Candidate>[] = [
+  {
+    id: "name",
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => (
+      <Link href={`/candidates/${row.original.id}`} className="block">
+        <span className="font-medium font-mono text-sm transition-colors group-hover:text-primary">
+          {row.original.name}
+        </span>
+      </Link>
+    ),
+  },
+  {
+    id: "email",
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => (
+      <Link
+        href={`/candidates/${row.original.id}`}
+        className="block font-sans text-muted-foreground text-sm"
+      >
+        {row.original.email}
+      </Link>
+    ),
+  },
+  {
+    id: "skills",
+    accessorKey: "skills",
+    header: "Skills",
+    cell: ({ row }) => (
+      <Link href={`/candidates/${row.original.id}`} className="block">
+        <div className="flex flex-wrap gap-1">
+          {row.original.skills.slice(0, 4).map((skill) => (
+            <Badge
+              key={skill}
+              className="rounded-full border border-border bg-transparent px-1.5 py-0 font-mono text-[9px] text-foreground/70"
+            >
+              {skill}
+            </Badge>
+          ))}
+          {row.original.skills.length > 4 && (
+            <Badge className="rounded-full border border-border bg-transparent px-1.5 py-0 font-mono text-[9px] text-muted-foreground">
+              +{row.original.skills.length - 4}
+            </Badge>
+          )}
+        </div>
+      </Link>
+    ),
+  },
+  {
+    id: "experience",
+    accessorKey: "experience",
+    header: "Exp.",
+    cell: ({ row }) => (
+      <Link
+        href={`/candidates/${row.original.id}`}
+        className="block font-mono text-muted-foreground text-sm tabular-nums"
+      >
+        {row.original.experience}yr{row.original.experience !== 1 ? "s" : ""}
+      </Link>
+    ),
+  },
+  {
+    id: "applicationCount",
+    accessorKey: "applicationCount",
+    header: "Applications",
+    cell: ({ row }) => (
+      <Link
+        href={`/candidates/${row.original.id}`}
+        className="block font-mono text-muted-foreground text-sm tabular-nums text-right"
+      >
+        {row.original.applicationCount}
+      </Link>
+    ),
+  },
+];
+
 export function CandidatesTable({
   candidates,
   initialSearch,
@@ -31,18 +131,17 @@ export function CandidatesTable({
   candidates: Candidate[];
   initialSearch?: string;
 }) {
-  const [search, setSearch] = useState(initialSearch ?? "");
+  const [globalFilter, setGlobalFilter] = useState(initialSearch ?? "");
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    if (!q) return candidates;
-    return candidates.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        c.skills.some((s) => s.toLowerCase().includes(q)),
-    );
-  }, [candidates, search]);
+  const table = useReactTable({
+    data: candidates,
+    columns,
+    state: { globalFilter },
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn,
+  });
 
   return (
     <div className="flex flex-1 flex-col">
@@ -50,99 +149,48 @@ export function CandidatesTable({
       <div className="border-b px-4 py-2">
         <Input
           placeholder="Search by name, email, or skill…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
       </div>
 
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
-              Name
-            </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
-              Email
-            </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
-              Skills
-            </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
-              Exp.
-            </TableHead>
-            <TableHead className="text-right font-mono text-[10px] uppercase tracking-[0.15em]">
-              Applications
-            </TableHead>
-          </TableRow>
+          {table.getHeaderGroups().map((hg) => (
+            <TableRow key={hg.id}>
+              {hg.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  className={`font-mono text-[10px] uppercase tracking-[0.15em]${header.id === "applicationCount" ? " text-right" : ""}`}
+                >
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
         </TableHeader>
         <TableBody>
-          {filtered.length === 0 ? (
+          {table.getRowModel().rows.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={columns.length}
                 className="py-12 text-center font-mono text-muted-foreground text-sm"
               >
                 No candidates found.
               </TableCell>
             </TableRow>
           ) : (
-            filtered.map((candidate) => (
+            table.getRowModel().rows.map((row) => (
               <TableRow
-                key={candidate.id}
+                key={row.id}
                 className="group cursor-pointer hover:bg-muted/20"
               >
-                <TableCell>
-                  <Link href={`/candidates/${candidate.id}`} className="block">
-                    <span className="font-medium font-mono text-sm transition-colors group-hover:text-primary">
-                      {candidate.name}
-                    </span>
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/candidates/${candidate.id}`}
-                    className="block font-sans text-muted-foreground text-sm"
-                  >
-                    {candidate.email}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/candidates/${candidate.id}`} className="block">
-                    <div className="flex flex-wrap gap-1">
-                      {candidate.skills.slice(0, 4).map((skill) => (
-                        <Badge
-                          key={skill}
-                          className="rounded-full border border-border bg-transparent px-1.5 py-0 font-mono text-[9px] text-foreground/70"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                      {candidate.skills.length > 4 && (
-                        <Badge className="rounded-full border border-border bg-transparent px-1.5 py-0 font-mono text-[9px] text-muted-foreground">
-                          +{candidate.skills.length - 4}
-                        </Badge>
-                      )}
-                    </div>
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/candidates/${candidate.id}`}
-                    className="block font-mono text-muted-foreground text-sm tabular-nums"
-                  >
-                    {candidate.experience}yr
-                    {candidate.experience !== 1 ? "s" : ""}
-                  </Link>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Link
-                    href={`/candidates/${candidate.id}`}
-                    className="block font-mono text-muted-foreground text-sm tabular-nums"
-                  >
-                    {candidate.applicationCount}
-                  </Link>
-                </TableCell>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
             ))
           )}

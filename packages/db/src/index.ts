@@ -17,6 +17,7 @@ export {
   gte,
   ilike,
   inArray,
+  isNull,
   lte,
   not,
   or,

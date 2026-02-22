@@ -1,7 +1,10 @@
-import { ArrowLeft, LayoutGrid } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DeleteJobDialog } from "@/components/jobs/delete-job-dialog";
+import { EditJobModal } from "@/components/jobs/edit-job-modal";
+import { JobDetailTabs } from "@/components/jobs/job-detail-tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -81,13 +84,21 @@ export default async function JobDetailPage({
             Jobs
           </Link>
         </div>
-        <Button size="sm" asChild>
-          <Link href={`/jobs/${id}/pipeline`}>
-            <LayoutGrid className="size-3.5" />
-            View Pipeline
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <EditJobModal job={job}>
+            <Button variant="outline" size="sm">
+              Edit
+            </Button>
+          </EditJobModal>
+          <DeleteJobDialog job={job}>
+            <Button variant="destructive" size="sm">
+              Delete
+            </Button>
+          </DeleteJobDialog>
+        </div>
       </header>
+
+      <JobDetailTabs jobId={id} active="overview" />
 
       <div className="flex flex-1 flex-col gap-0">
         {/* Job info */}

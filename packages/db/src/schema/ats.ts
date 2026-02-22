@@ -34,6 +34,7 @@ export const jobs = pgTable("jobs", {
   location: text("location"),
   status: jobStatusEnum("status").default("DRAFT").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const candidates = pgTable(

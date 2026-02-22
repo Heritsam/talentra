@@ -1,11 +1,12 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { api } from "@/lib/api";
+import { JobDetailTabs } from "@/components/jobs/job-detail-tabs";
+import { KanbanBoard } from "@/components/pipeline/kanban-board";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { KanbanBoard } from "@/components/pipeline/kanban-board";
+import { api } from "@/lib/api";
 
 export default async function PipelinePage({
   params,
@@ -32,13 +33,15 @@ export default async function PipelinePage({
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Link
             href={`/jobs/${id}`}
-            className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground uppercase tracking-[0.15em] transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-3" />
             {job.title}
           </Link>
-          <span className="font-mono text-[10px] text-muted-foreground/40">/</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+          <span className="font-mono text-[10px] text-muted-foreground/40">
+            /
+          </span>
+          <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
             Pipeline
           </span>
         </div>
@@ -46,6 +49,8 @@ export default async function PipelinePage({
           {applicants.length} applicant{applicants.length !== 1 ? "s" : ""}
         </span>
       </header>
+
+      <JobDetailTabs jobId={id} active="pipeline" />
 
       <div className="flex flex-1 overflow-hidden">
         <KanbanBoard jobId={id} initialApplications={applicants} />

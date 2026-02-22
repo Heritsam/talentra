@@ -1,5 +1,6 @@
 import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+
 import { CreateJobModal } from "@/components/jobs/create-job-modal";
 import { JobsTable } from "@/components/jobs/jobs-table";
 import { Button } from "@/components/ui/button";
@@ -10,9 +11,9 @@ import { api } from "@/lib/api";
 export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; search?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, search } = await searchParams;
   const jobs = await api.jobs.list();
 
   return (
@@ -38,7 +39,7 @@ export default async function JobsPage({
       </header>
 
       <div className="flex flex-1 flex-col">
-        <JobsTable jobs={jobs} activeStatus={status} />
+        <JobsTable jobs={jobs} activeStatus={status} initialSearch={search} />
       </div>
     </>
   );
