@@ -1,11 +1,14 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 import { Badge } from "@/components/ui/badge";
-import { KanbanCard } from "./kanban-card";
 import type { ApplicationItem } from "./kanban-board";
+import { KanbanCard } from "./kanban-card";
 
 export function KanbanColumn({
   id,
@@ -22,13 +25,15 @@ export function KanbanColumn({
 
   return (
     <div
-      className={`flex min-w-[200px] flex-1 flex-col transition-colors ${
+      className={`flex min-w-50 flex-1 flex-col transition-colors ${
         isOver ? "bg-muted/40" : "bg-background"
       }`}
     >
       {/* Column header */}
       <div className="flex items-center justify-between border-b bg-muted/20 px-3 py-2.5">
-        <Badge className={`${color} rounded-full border-0 px-2 py-0.5 font-mono text-[10px] font-medium`}>
+        <Badge
+          className={`${color} rounded-full border-0 px-2 py-0.5 font-medium font-mono text-[10px]`}
+        >
           {label}
         </Badge>
         <span className="font-mono text-[10px] text-muted-foreground tabular-nums">

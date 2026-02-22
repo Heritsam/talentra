@@ -41,14 +41,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-3">
-          <div className="flex aspect-square size-7 items-center justify-center bg-primary">
-            <HugeiconsIcon
-              icon={GridViewIcon}
-              strokeWidth={2}
-              className="size-4 text-primary-foreground"
-            />
-          </div>
+        <div className="flex items-center gap-2 px-2 py-3 group-data-[collapsible=icon]:hidden:p-1!">
+          <div className="h-5 w-5 bg-primary" />
           <span className="font-bold font-mono text-sm uppercase tracking-widest group-data-[collapsible=icon]:hidden">
             Talentra
           </span>
