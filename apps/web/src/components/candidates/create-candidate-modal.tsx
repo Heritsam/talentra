@@ -1,9 +1,12 @@
+/** biome-ignore-all lint/correctness/noChildrenProp: tanstack form */
 "use client";
 
+import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { orpc } from "@/utils/orpc";
@@ -23,59 +27,57 @@ export function CreateCandidateModal({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    skills: "",
-    experience: "0",
-    notes: "",
-  });
 
   const mutation = useMutation(orpc.candidates.create.mutationOptions());
 
-  function handleChange(field: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      skills: "",
+      experience: 0,
+      notes: "",
+    },
+    validators: {
+      onSubmit: z.object({
+        name: z.string().min(1, "Name is required"),
+        email: z.email("Invalid email address"),
+        phone: z.string(),
+        skills: z.string(),
+        experience: z.number().int().min(0),
+        notes: z.string(),
+      }),
+    },
+    onSubmit: async ({ value }) => {
+      const skills = value.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.name || !form.email) return;
-
-    const skills = form.skills
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    mutation.mutate(
-      {
-        name: form.name,
-        email: form.email,
-        phone: form.phone || undefined,
-        skills,
-        experience: Number.parseInt(form.experience, 10) || 0,
-        notes: form.notes || undefined,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Candidate added successfully");
-          setOpen(false);
-          setForm({
-            name: "",
-            email: "",
-            phone: "",
-            skills: "",
-            experience: "0",
-            notes: "",
-          });
-          router.refresh();
+      mutation.mutate(
+        {
+          name: value.name,
+          email: value.email,
+          phone: value.phone || undefined,
+          skills,
+          experience: value.experience,
+          notes: value.notes || undefined,
         },
-        onError: (err) => {
-          toast.error(err.message || "Failed to add candidate");
+        {
+          onSuccess: () => {
+            toast.success("Candidate added successfully");
+            setOpen(false);
+            form.reset();
+            router.refresh();
+          },
+          onError: (err) => {
+            toast.error(err.message || "Failed to add candidate");
+          },
         },
-      },
-    );
-  }
+      );
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -86,71 +88,135 @@ export function CreateCandidateModal({
             New Candidate
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+          className="flex flex-col gap-4 pt-2"
+        >
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
-                Name <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                placeholder="Full name"
-                value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
-                Email <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                type="email"
-                placeholder="email@example.com"
-                value={form.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                required
-              />
-            </div>
-          </div>
+            <form.Field
+              name="name"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
-                Phone
-              </Label>
-              <Input
-                placeholder="+1 555 000 0000"
-                value={form.phone}
-                onChange={(e) => handleChange("phone", e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
-                Experience (years)
-              </Label>
-              <Input
-                type="number"
-                min="0"
-                max="50"
-                value={form.experience}
-                onChange={(e) => handleChange("experience", e.target.value)}
-              />
-            </div>
-          </div>
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                      Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      placeholder="Full name"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      required
+                    />
+                    {isInvalid && (
+                      <FieldError
+                        className="text-xs"
+                        errors={field.state.meta.errors}
+                      />
+                    )}
+                  </div>
+                );
+              }}
+            />
+            <form.Field
+              name="email"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
 
-          <div className="flex flex-col gap-1.5">
-            <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
-              Skills
-              <span className="ml-1 text-muted-foreground normal-case tracking-normal">
-                (comma-separated)
-              </span>
-            </Label>
-            <Input
-              placeholder="React, TypeScript, Node.js"
-              value={form.skills}
-              onChange={(e) => handleChange("skills", e.target.value)}
+                return (
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                      Email <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      type="email"
+                      placeholder="email@example.com"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      required
+                    />
+                    {isInvalid && (
+                      <FieldError
+                        className="text-xs"
+                        errors={field.state.meta.errors}
+                      />
+                    )}
+                  </div>
+                );
+              }}
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <form.Field
+              name="phone"
+              children={(field) => (
+                <div className="flex flex-col gap-1.5">
+                  <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                    Phone
+                  </Label>
+                  <Input
+                    placeholder="+1 555 000 0000"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </div>
+              )}
+            />
+            <form.Field
+              name="experience"
+              children={(field) => (
+                <div className="flex flex-col gap-1.5">
+                  <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                    Experience (years)
+                  </Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="50"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) =>
+                      field.handleChange(
+                        Number.parseInt(e.target.value, 10) || 0,
+                      )
+                    }
+                  />
+                </div>
+              )}
+            />
+          </div>
+
+          <form.Field
+            name="skills"
+            children={(field) => (
+              <div className="flex flex-col gap-1.5">
+                <Label className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                  Skills
+                  <span className="ml-1 text-muted-foreground normal-case tracking-normal">
+                    (comma-separated)
+                  </span>
+                </Label>
+                <Input
+                  placeholder="React, TypeScript, Node.js"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )}
+          />
 
           <div className="flex justify-end gap-2 border-t pt-4">
             <Button
@@ -160,9 +226,14 @@ export function CreateCandidateModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? "Adding…" : "Add Candidate"}
-            </Button>
+            <form.Subscribe
+              selector={(state) => [state.isSubmitting, state.canSubmit]}
+              children={([isSubmitting, canSubmit]) => (
+                <Button type="submit" disabled={!canSubmit || isSubmitting}>
+                  {isSubmitting ? "Adding…" : "Add Candidate"}
+                </Button>
+              )}
+            />
           </div>
         </form>
       </DialogContent>

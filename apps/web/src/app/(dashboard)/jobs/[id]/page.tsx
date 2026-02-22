@@ -1,9 +1,7 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft, LayoutGrid } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
-import { api } from "@/lib/api";
-import { timeAgo } from "@/lib/time";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { api } from "@/lib/api";
+import { timeAgo } from "@/lib/time";
 
 const JOB_STATUS_COLORS: Record<string, string> = {
   OPEN: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
@@ -26,14 +26,22 @@ const JOB_STATUS_COLORS: Record<string, string> = {
 const APP_STATUS_COLORS: Record<string, string> = {
   APPLIED: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
   SCREENING: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  INTERVIEW: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
+  INTERVIEW:
+    "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300",
   OFFER: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
-  HIRED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  HIRED:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
   REJECTED: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
 };
 
-const PIPELINE_STAGES = ["APPLIED", "SCREENING", "INTERVIEW", "OFFER", "HIRED", "REJECTED"] as const;
-
+const PIPELINE_STAGES = [
+  "APPLIED",
+  "SCREENING",
+  "INTERVIEW",
+  "OFFER",
+  "HIRED",
+  "REJECTED",
+] as const;
 
 export default async function JobDetailPage({
   params,
@@ -67,7 +75,7 @@ export default async function JobDetailPage({
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Link
             href="/jobs"
-            className="flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground uppercase tracking-[0.15em] transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-3" />
             Jobs
@@ -86,9 +94,9 @@ export default async function JobDetailPage({
         <div className="border-b px-6 py-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="mb-1 flex items-center gap-2">
                 <Badge
-                  className={`${JOB_STATUS_COLORS[job.status]} rounded-full border-0 px-2 py-0.5 font-mono text-[10px] font-medium`}
+                  className={`${JOB_STATUS_COLORS[job.status]} rounded-full border-0 px-2 py-0.5 font-medium font-mono text-[10px]`}
                 >
                   {job.status.charAt(0) + job.status.slice(1).toLowerCase()}
                 </Badge>
@@ -104,7 +112,9 @@ export default async function JobDetailPage({
                   </>
                 )}
               </div>
-              <h1 className="font-mono font-bold text-2xl tracking-tight">{job.title}</h1>
+              <h1 className="font-bold font-mono text-2xl tracking-tight">
+                {job.title}
+              </h1>
             </div>
           </div>
 
@@ -113,11 +123,11 @@ export default async function JobDetailPage({
             {PIPELINE_STAGES.map((stage) => (
               <div key={stage} className="flex flex-col gap-1 border p-3">
                 <span
-                  className={`${APP_STATUS_COLORS[stage]} w-fit rounded-full border-0 px-1.5 py-0.5 font-mono text-[9px] font-medium`}
+                  className={`${APP_STATUS_COLORS[stage]} w-fit rounded-full border-0 px-1.5 py-0.5 font-medium font-mono text-[9px]`}
                 >
                   {stage.charAt(0) + stage.slice(1).toLowerCase()}
                 </span>
-                <span className="font-mono font-bold text-2xl tabular-nums leading-none">
+                <span className="font-bold font-mono text-2xl tabular-nums leading-none">
                   {stageCounts[stage]}
                 </span>
               </div>
@@ -128,23 +138,34 @@ export default async function JobDetailPage({
         {/* Applicants table */}
         <div>
           <div className="border-b px-6 py-3">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
               {applicants.length} applicant{applicants.length !== 1 ? "s" : ""}
             </p>
           </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">Candidate</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">Email</TableHead>
-                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">Stage</TableHead>
-                <TableHead className="text-right font-mono text-[10px] uppercase tracking-[0.15em]">Applied</TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                  Candidate
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                  Email
+                </TableHead>
+                <TableHead className="font-mono text-[10px] uppercase tracking-[0.15em]">
+                  Stage
+                </TableHead>
+                <TableHead className="text-right font-mono text-[10px] uppercase tracking-[0.15em]">
+                  Applied
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {applicants.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="py-12 text-center font-mono text-sm text-muted-foreground">
+                  <TableCell
+                    colSpan={4}
+                    className="py-12 text-center font-mono text-muted-foreground text-sm"
+                  >
                     No applicants yet.
                   </TableCell>
                 </TableRow>
@@ -152,21 +173,25 @@ export default async function JobDetailPage({
                 applicants.map((app) => (
                   <TableRow key={app.id} className="hover:bg-muted/20">
                     <TableCell>
-                      <Link href={`/candidates/${app.candidate.id}`} className="font-mono font-medium text-sm hover:text-primary transition-colors">
+                      <Link
+                        href={`/candidates/${app.candidate.id}`}
+                        className="font-medium font-mono text-sm transition-colors hover:text-primary"
+                      >
                         {app.candidate.name}
                       </Link>
                     </TableCell>
-                    <TableCell className="font-sans text-sm text-muted-foreground">
+                    <TableCell className="font-sans text-muted-foreground text-sm">
                       {app.candidate.email}
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`${APP_STATUS_COLORS[app.status]} rounded-full border-0 px-2 py-0.5 font-mono text-[10px] font-medium`}
+                        className={`${APP_STATUS_COLORS[app.status]} rounded-full border-0 px-2 py-0.5 font-medium font-mono text-[10px]`}
                       >
-                        {app.status.charAt(0) + app.status.slice(1).toLowerCase()}
+                        {app.status.charAt(0) +
+                          app.status.slice(1).toLowerCase()}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-mono text-[10px] tabular-nums text-muted-foreground">
+                    <TableCell className="text-right font-mono text-[10px] text-muted-foreground tabular-nums">
                       {timeAgo(app.createdAt)}
                     </TableCell>
                   </TableRow>
