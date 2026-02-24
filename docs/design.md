@@ -213,7 +213,8 @@ shadcn handles dark mode via `dark:` variants on CSS variables — no manual dar
 
 ## Do / Don't
 
-| Do | Don't ||
+| Do | Don't |
+|---|---|
 | `border bg-card` on all surfaces | `rounded-lg` / `shadow-md` on cards |
 | Semantic tokens (`bg-muted`, `text-foreground`) | Raw color scales (`bg-slate-100`, `text-gray-500`) |
 | `uppercase tracking-wide text-xs` for labels | Title-case muted labels |
